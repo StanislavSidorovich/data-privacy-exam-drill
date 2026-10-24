@@ -335,6 +335,7 @@ function renderExam() {
   app.innerHTML = `
   <div class="bar">
     <div class="bar-top">
+      <button class="btn" id="home">← Home</button>
       <span class="timer" id="timer"></span>
       <span class="mono muted" style="font-size:13px">${answered}/${items.length} answered</span>
       <button class="btn primary" id="finish">Finish attempt</button>
@@ -362,6 +363,15 @@ function renderExam() {
   document.getElementById("prev").onclick = () => { S.cur--; renderExam(); };
   document.getElementById("next").onclick = () => { S.cur++; renderExam(); };
   document.getElementById("finish").onclick = confirmFinish;
+  document.getElementById("home").onclick = () => {
+    const m = document.createElement("div");
+    m.className = "modal";
+    m.innerHTML = `<div><h3>Leave the mock exam?</h3><p class="muted">This attempt will be discarded and not scored.</p>
+      <div class="row"><button class="btn danger" id="leave">Leave without scoring</button><button class="btn" id="stay">Keep going</button></div></div>`;
+    document.body.appendChild(m);
+    m.querySelector("#stay").onclick = () => m.remove();
+    m.querySelector("#leave").onclick = () => { m.remove(); go("home"); };
+  };
 
   const timer = document.getElementById("timer");
   const upd = () => {
@@ -464,6 +474,7 @@ function renderPractice() {
   const answered = item.pick !== null;
   app.innerHTML = `
   <div class="bar"><div class="bar-top">
+    <button class="btn" id="home">← Home</button>
     <span class="eyebrow">${esc(label)}</span>
     <span class="mono" style="font-size:13px">${ok}/${done.length} correct · ${fmt(pts)} pts</span>
     <button class="btn" id="stop">Finish</button>
@@ -490,6 +501,7 @@ function renderPractice() {
   };
   document.getElementById("next").onclick = () => cur === items.length - 1 ? finishPractice() : (S.cur++, renderPractice(), window.scrollTo(0, 0));
   document.getElementById("stop").onclick = finishPractice;
+  document.getElementById("home").onclick = () => go("home");
 }
 
 // ---------- QUESTION BANK ----------
