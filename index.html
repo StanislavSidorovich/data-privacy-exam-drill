@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data Privacy Exam Drill</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Layout: one centred working column; a sticky exam bar; cards only for the question and the result score. */
+  :root {
+    --bg: #eef1f5; --surface: #ffffff; --ink: #121b26; --muted: #5a6676; --line: #d5dbe3;
+    --accent: #2340b8; --accent-soft: #e3e8fb; --star: #c99300;
+    --good: #1d7a4c; --good-soft: #e1f3e9; --bad: #b42318; --bad-soft: #fbe6e4; --skip: #7a8594;
+    --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+    --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e141c; --surface: #161f2a; --ink: #e7ecf2; --muted: #98a4b3; --line: #273342;
+      --accent: #8399ff; --accent-soft: #1d2747; --star: #f2c230;
+      --good: #4cc38a; --good-soft: #13301f; --bad: #f07167; --bad-soft: #3a1714; --skip: #8a96a5;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e141c; --surface: #161f2a; --ink: #e7ecf2; --muted: #98a4b3; --line: #273342;
+    --accent: #8399ff; --accent-soft: #1d2747; --star: #f2c230;
+    --good: #4cc38a; --good-soft: #13301f; --bad: #f07167; --bad-soft: #3a1714; --skip: #8a96a5;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  .wrap { max-width: 760px; margin: 0 auto; padding-block: 28px 64px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+  h1 { font-size: clamp(30px, 6vw, 44px); font-weight: 800; line-height: 1.05; }
+  h2 { font-size: 22px; font-weight: 800; }
+  h3 { font-size: 17px; font-weight: 600; }
+  p { margin: 0; }
+  .eyebrow { font: 500 12px/1 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .muted { color: var(--muted); }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .stack { display: flex; flex-direction: column; gap: 16px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  button { font: inherit; cursor: pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 9px 16px; font-weight: 500; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); font-weight: 600; }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn.danger { color: var(--bad); border-color: var(--bad); }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .link { background: none; border: 0; color: var(--accent); padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Home */
+  header.hero { display: grid; gap: 14px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+  .rule-strip { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 500 13px/1.4 var(--mono); color: var(--muted); }
+  .rule-strip b { color: var(--ink); font-weight: 500; }
+  .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 24px; }
+  .mode { text-align: left; display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; color: var(--ink); }
+  .mode:hover { border-color: var(--accent); }
+  .mode .k { font: 500 12px/1 var(--mono); color: var(--accent); letter-spacing: .06em; text-transform: uppercase; }
+  .mode strong { font: 800 19px/1.2 var(--display); }
+  .mode span { color: var(--muted); font-size: 14px; }
+  .section { margin-top: 32px; display: grid; gap: 12px; }
+  .chap-list { display: grid; gap: 6px; }
+  .chap { display: grid; grid-template-columns: 22px 1fr auto auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .chap input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .chap .n { font: 500 13px var(--mono); color: var(--muted); }
+  .note { border-left: 3px solid var(--star); padding: 4px 0 4px 14px; color: var(--muted); font-size: 14px; }
+  .note b { color: var(--ink); }
+  .history { font: 500 13px/1.8 var(--mono); color: var(--muted); }
+
+  /* Exam bar */
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+  .bar-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .timer { font: 500 20px/1 var(--mono); font-variant-numeric: tabular-nums; }
+  .timer.warn { color: var(--star); }
+  .timer.over { color: var(--bad); }
+  .grid { display: flex; flex-wrap: wrap; gap: 5px; }
+  .cell { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font: 500 12px/1 var(--mono); padding: 0; }
+  .cell.done { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .cell.cur { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .cell.flag { box-shadow: inset 0 -3px 0 var(--star); }
+  .cell.r-good { background: var(--good-soft); color: var(--good); border-color: var(--good); }
+  .cell.r-bad { background: var(--bad-soft); color: var(--bad); border-color: var(--bad); }
+
+  /* Question */
+  .qcard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: grid; gap: 16px; margin-top: 18px; min-width: 0; }
+  .qmeta { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .qtext { font-size: 17px; font-weight: 500; line-height: 1.45; }
+  .opts { display: grid; gap: 8px; }
+  .opt { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; text-align: left; width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 11px 12px; }
+  .opt:hover:not(:disabled) { border-color: var(--accent); }
+  .opt .l { font: 500 13px/22px var(--mono); color: var(--muted); }
+  .opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .opt.sel .l { color: var(--accent); }
+  .opt.ok { border-color: var(--good); background: var(--good-soft); }
+  .opt.ok .l { color: var(--good); }
+  .opt.no { border-color: var(--bad); background: var(--bad-soft); }
+  .opt.no .l { color: var(--bad); }
+  .opt:disabled { cursor: default; }
+  .explain { border-top: 1px dashed var(--line); padding-top: 14px; font-size: 14px; color: var(--muted); }
+  .explain b { color: var(--ink); }
+  .verdict { font: 600 14px var(--body); }
+  .verdict.good { color: var(--good); } .verdict.bad { color: var(--bad); } .verdict.skip { color: var(--skip); }
+  .nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+  /* Results */
+  .score { display: grid; grid-template-columns: auto 1fr; gap: 6px 24px; align-items: end; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+  .score .big { font: 800 56px/1 var(--display); font-variant-numeric: tabular-nums; }
+  .score .big small { font-size: 22px; color: var(--muted); font-weight: 600; }
+  @media (max-width: 520px) { .score { grid-template-columns: 1fr; } }
+  .tally { display: flex; gap: 18px; flex-wrap: wrap; font: 500 14px var(--mono); }
+  .tally .g { color: var(--good); } .tally .b { color: var(--bad); } .tally .s { color: var(--skip); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  .tbl { overflow-x: auto; }
+  th, td { text-align: left; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); }
+  th { font: 500 12px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  th.num { text-align: right; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; background: var(--surface); color: var(--muted); padding: 7px 12px; font-size: 13px; }
+  .seg button.on { background: var(--accent); color: var(--surface); }
+  .review { display: grid; gap: 4px; }
+  .review .qcard { margin-top: 10px; }
+
+  /* Bank */
+  .tools { display: flex; gap: 10px; flex-wrap: wrap; }
+  .tools input, .tools select { font: inherit; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 9px 12px; min-width: 0; }
+  .tools input { flex: 1 1 220px; }
+  details.bank { border-bottom: 1px solid var(--line); padding: 12px 0; }
+  details.bank summary { cursor: pointer; list-style: none; display: grid; grid-template-columns: auto 1fr; gap: 12px; }
+  details.bank summary::-webkit-details-marker { display: none; }
+  details.bank .id { font: 500 12px/22px var(--mono); color: var(--muted); white-space: nowrap; }
+  details.bank ol { margin: 10px 0 8px; padding-left: 22px; display: grid; gap: 4px; }
+  details.bank li.ok { color: var(--good); font-weight: 600; }
+  details.bank .explain { margin-left: 0; }
+
+  .modal { position: fixed; inset: 0; background: rgb(0 0 0 / .45); display: grid; place-items: center; z-index: 20;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .modal > div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; max-width: 420px; display: grid; gap: 14px; }
+  .prefs { max-width: 760px; margin: 0 auto; padding-block: 12px 0; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .prefs .seg button { min-height: 32px; min-width: 34px; }
+  #app, .modal > div { zoom: var(--zoom, 1); }
+  footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
+  @media (prefers-reduced-motion: no-preference) { .qcard { animation: in .18s ease-out; } @keyframes in { from { transform: translateY(4px); } to { transform: none; } } }
+</style>
+
+<div class="prefs" role="toolbar" aria-label="Display settings">
+  <div class="seg" id="theme-seg" aria-label="Theme">
+    <button data-theme-set="auto">Auto</button><button data-theme-set="light">Light</button><button data-theme-set="dark">Dark</button>
+  </div>
+  <div class="seg" id="size-seg" aria-label="Text size">
+    <button data-size="1" style="font-size:12px">A</button><button data-size="1.12" style="font-size:14px">A</button><button data-size="1.25" style="font-size:16px">A</button><button data-size="1.4" style="font-size:18px">A</button>
+  </div>
+</div>
+<div class="wrap" id="app"></div>
+
+<script src="questions.js"></script>
+<script>
+const EXAM_SIZE = 25, EXAM_MINUTES = 40, POINTS = 0.8;
+const LETTERS = "ABCDEFGH";
+const app = document.getElementById("app");
+QUESTIONS.forEach((q, i) => { q.id = i + 1; });
+
+// ---------- storage (per-viewer convenience only) ----------
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("dpse:" + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("dpse:" + k, JSON.stringify(v)); } catch {} },
+};
+// Display settings: theme (auto follows the device) and text size, remembered per browser.
+function applyPrefs() {
+  const theme = store.get("theme", "auto"), size = store.get("size", 1);
+  if (theme === "auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", theme);
+  document.documentElement.style.setProperty("--zoom", size);
+  document.querySelectorAll("[data-theme-set]").forEach(b => b.classList.toggle("on", b.dataset.themeSet === theme));
+  document.querySelectorAll("[data-size]").forEach(b => b.classList.toggle("on", +b.dataset.size === size));
+}
+document.querySelectorAll("[data-theme-set]").forEach(b => b.onclick = () => { store.set("theme", b.dataset.themeSet); applyPrefs(); });
+document.querySelectorAll("[data-size]").forEach(b => b.onclick = () => { store.set("size", +b.dataset.size); applyPrefs(); });
+applyPrefs();
+
+let misses = store.get("misses", {});   // id -> times answered wrong (and not yet fixed)
+let history = store.get("history", []); // [{date, score, c, w, s}]
+
+// ---------- helpers ----------
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmt = n => (Math.round(n * 100) / 100).toFixed(2);
+const penalty = q => POINTS / q.o.length;
+const chapterCount = c => QUESTIONS.filter(q => q.c === c).length;
+
+// An item is a question plus its option order for this run (true/false keeps True first).
+const makeItem = q => ({ q, order: q.tf ? [0, 1] : shuffle(q.o.map((_, i) => i)), pick: null, flag: false });
+
+// Spread the 25 exam questions across chapters in proportion to their size (largest remainder).
+function pickExam() {
+  const chs = Object.keys(CHAPTERS).map(Number);
+  const raw = chs.map(c => ({ c, x: chapterCount(c) / QUESTIONS.length * EXAM_SIZE }));
+  raw.forEach(r => r.n = Math.floor(r.x));
+  let left = EXAM_SIZE - raw.reduce((s, r) => s + r.n, 0);
+  raw.slice().sort((a, b) => (b.x - b.n) - (a.x - a.n)).slice(0, left).forEach(r => r.n++);
+  const chosen = raw.flatMap(r => shuffle(QUESTIONS.filter(q => q.c === r.c)).slice(0, r.n));
+  return shuffle(chosen).map(makeItem);
+}
+
+function recordAnswer(q, correct) {
+  if (correct) delete misses[q.id]; else misses[q.id] = (misses[q.id] || 0) + 1;
+  store.set("misses", misses);
+}
+
+// ---------- state ----------
+let S = { view: "home" };
+let tick = null;
+const selected = new Set(store.get("chapters", Object.keys(CHAPTERS).map(Number)));
+
+function go(view, extra = {}) {
+  clearInterval(tick);
+  S = { view, ...extra };
+  render();
+  window.scrollTo(0, 0);
+}
+
+function render() {
+  ({ home: renderHome, exam: renderExam, results: renderResults, practice: renderPractice, bank: renderBank }[S.view])();
+}
+
+// ---------- HOME ----------
+function renderHome() {
+  const missCount = Object.keys(misses).length;
+  const last = history.slice(-5).reverse();
+  app.innerHTML = `
+  <header class="hero">
+    <p class="eyebrow">NOVA IMS · Data Privacy, Security and Ethics · 2026/2027</p>
+    <h1>Data Privacy Exam Drill</h1>
+    <p class="muted">${QUESTIONS.length} multiple-choice and true/false questions built from the seven chapters of the course slides, each with a short explanation and a chapter reference.</p>
+    <div class="rule-strip">
+      <span><b>${EXAM_SIZE}</b> questions</span><span><b>${EXAM_MINUTES}</b> min</span>
+      <span>correct <b>+0.8</b></span><span>wrong <b>−0.8/n</b></span><span>blank <b>0</b></span><span>max <b>20</b></span>
+    </div>
+  </header>
+
+  <div class="modes">
+    <button class="mode" id="m-exam"><span class="k">Moodle format</span><strong>Mock exam</strong><span>25 random questions, 40-minute timer, free navigation, real scoring with penalties. Review every answer at the end.</span></button>
+    <button class="mode" id="m-practice"><span class="k">Instant feedback</span><strong>Practice</strong><span>Pick chapters below and answer one by one. The correct answer and explanation appear right after you choose.</span></button>
+    <button class="mode" id="m-misses" ${missCount ? "" : "disabled"}><span class="k">${missCount} saved</span><strong>My mistakes</strong><span>${missCount ? "Questions you got wrong before. Answer them correctly to clear them from the list." : "Empty for now. Wrong answers from the mock exam and practice collect here."}</span></button>
+    <button class="mode" id="m-bank"><span class="k">Read mode</span><strong>Question bank</strong><span>Browse and search all ${QUESTIONS.length} questions with answers and explanations.</span></button>
+  </div>
+
+  <section class="section">
+    <div class="row" style="justify-content:space-between"><h2>Chapters for practice</h2>
+      <span class="row"><button class="link" id="all">All</button><button class="link" id="none">None</button></span></div>
+    <div class="chap-list">
+      ${Object.entries(CHAPTERS).map(([c, t]) => `
+        <label class="chap"><input type="checkbox" id="ch${c}" data-c="${c}" ${selected.has(+c) ? "checked" : ""}>
+        <span><span class="mono muted">Ch.${c}</span>&nbsp; ${esc(t)}</span><span class="n">${chapterCount(+c)}</span>
+        <button class="btn" data-drill="${c}" style="padding:4px 10px;font-size:13px">Test</button></label>`).join("")}
+    </div>
+    <p class="muted" style="font-size:13px">Tick chapters for Practice, or press Test to run all questions of one chapter. The mock exam always draws from all chapters, in proportion to their size.</p>
+  </section>
+
+  <section class="section">
+    <h2>How the penalty works</h2>
+    <p class="note">A wrong answer costs <b>0.8 ÷ number of options</b>: −0.40 on true/false, −0.20 on a 4-option question. A pure guess still has a slightly positive expected value (+0.20 on T/F, +0.05 on 4 options), and it grows quickly once you can rule out one option. Leave a question blank only when you have no idea at all and two options look equally right to you.</p>
+  </section>
+
+  ${last.length ? `<section class="section"><h2>Your last mock exams</h2><div class="history">${last.map(h =>
+    `${esc(h.date)} — <b style="color:var(--ink)">${fmt(h.score)} / 20</b> · ${h.c} correct · ${h.w} wrong · ${h.s} blank`).join("<br>")}</div></section>` : ""}
+
+  <footer>Study aid made from the course slides. It is not the real exam: the actual questions are unknown. Your progress is saved only in this browser.</footer>`;
+
+  document.getElementById("m-exam").onclick = startExam;
+  document.getElementById("m-practice").onclick = () => {
+    const pool = QUESTIONS.filter(q => selected.has(q.c));
+    if (!pool.length) return;
+    go("practice", { items: shuffle(pool).map(makeItem), cur: 0, label: "Practice" });
+  };
+  document.getElementById("m-misses").onclick = () => {
+    const pool = QUESTIONS.filter(q => misses[q.id]);
+    go("practice", { items: shuffle(pool).map(makeItem), cur: 0, label: "My mistakes" });
+  };
+  document.getElementById("m-bank").onclick = () => go("bank", { query: "", ch: "0" });
+  app.querySelectorAll("[data-drill]").forEach(b => b.onclick = e => { e.preventDefault(); startChapter(+b.dataset.drill); });
+  const sync = () => { store.set("chapters", [...selected]); renderHome(); };
+  app.querySelectorAll(".chap input").forEach(el => el.onchange = () => { el.checked ? selected.add(+el.dataset.c) : selected.delete(+el.dataset.c); store.set("chapters", [...selected]); });
+  document.getElementById("all").onclick = () => { Object.keys(CHAPTERS).forEach(c => selected.add(+c)); sync(); };
+  document.getElementById("none").onclick = () => { selected.clear(); sync(); };
+}
+
+const startExam = () => go("exam", { items: pickExam(), cur: 0, end: Date.now() + EXAM_MINUTES * 60000 });
+const startChapter = c => go("practice", { items: shuffle(QUESTIONS.filter(q => q.c === c)).map(makeItem), cur: 0, label: `Ch.${c} · ${CHAPTERS[c]}`, chapter: c });
+
+// Practice ends on the same results screen as the exam, counting only the questions reached.
+function finishPractice() {
+  const items = S.items.slice(0, S.cur + 1).filter(i => i.pick !== null || i.skipped);
+  if (!items.length) return go("home");
+  let score = 0, c = 0, w = 0, s = 0;
+  items.forEach(it => {
+    if (it.pick === null) s++;
+    else if (it.pick === it.q.a) { c++; score += POINTS; }
+    else { w++; score -= penalty(it.q); }
+  });
+  go("results", { items, score, c, w, s, filter: "wrong", practice: S.label, chapter: S.chapter });
+}
+
+// ---------- shared option rendering ----------
+function optionsHTML(item, { reveal = false, disabled = false } = {}) {
+  return item.order.map((oi, pos) => {
+    let cls = "opt";
+    if (reveal) { if (oi === item.q.a) cls += " ok"; else if (oi === item.pick) cls += " no"; }
+    else if (oi === item.pick) cls += " sel";
+    return `<button class="${cls}" data-oi="${oi}" ${disabled ? "disabled" : ""}><span class="l">${LETTERS[pos]}</span><span>${esc(item.q.o[oi])}</span></button>`;
+  }).join("");
+}
+function explainHTML(item) {
+  const q = item.q, ok = item.pick === q.a, blank = item.pick === null;
+  const right = LETTERS[item.order.indexOf(q.a)];
+  const verdict = blank ? `<span class="verdict skip">Not answered · 0</span>`
+    : ok ? `<span class="verdict good">Correct · +${fmt(POINTS)}</span>`
+    : `<span class="verdict bad">Wrong · −${fmt(penalty(q))}</span>`;
+  return `<div class="explain">${verdict}<br><b>Answer ${right}:</b> ${esc(q.o[q.a])}<br>${esc(q.e)}</div>`;
+}
+const metaHTML = (item, n, total) => `<div class="qmeta"><span class="eyebrow">Question ${n} of ${total}</span><span class="eyebrow">Ch.${item.q.c} · ${esc(CHAPTERS[item.q.c])} · ${item.q.tf ? "True/False" : item.q.o.length + " options"}</span></div>`;
+
+// ---------- EXAM ----------
+function renderExam() {
+  const { items, cur } = S, item = items[cur];
+  const answered = items.filter(i => i.pick !== null).length;
+  app.innerHTML = `
+  <div class="bar">
+    <div class="bar-top">
+      <span class="timer" id="timer"></span>
+      <span class="mono muted" style="font-size:13px">${answered}/${items.length} answered</span>
+      <button class="btn primary" id="finish">Finish attempt</button>
+    </div>
+    <div class="grid">${items.map((it, i) => `<button class="cell ${it.pick !== null ? "done" : ""} ${i === cur ? "cur" : ""} ${it.flag ? "flag" : ""}" data-i="${i}" aria-label="Question ${i + 1}">${i + 1}</button>`).join("")}</div>
+  </div>
+  <div class="qcard">
+    ${metaHTML(item, cur + 1, items.length)}
+    <p class="qtext">${esc(item.q.q)}</p>
+    <div class="opts">${optionsHTML(item)}</div>
+    <div class="row">
+      <button class="link" id="clear" ${item.pick === null ? "disabled" : ""}>Clear my choice</button>
+      <button class="link" id="flag">${item.flag ? "Remove flag" : "Flag for review"}</button>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="btn" id="prev" ${cur === 0 ? "disabled" : ""}>← Previous</button>
+    <button class="btn" id="next" ${cur === items.length - 1 ? "disabled" : ""}>Next →</button>
+  </div>`;
+
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => { item.pick = +b.dataset.oi; renderExam(); });
+  app.querySelectorAll(".cell").forEach(b => b.onclick = () => { S.cur = +b.dataset.i; renderExam(); });
+  document.getElementById("clear").onclick = () => { item.pick = null; renderExam(); };
+  document.getElementById("flag").onclick = () => { item.flag = !item.flag; renderExam(); };
+  document.getElementById("prev").onclick = () => { S.cur--; renderExam(); };
+  document.getElementById("next").onclick = () => { S.cur++; renderExam(); };
+  document.getElementById("finish").onclick = confirmFinish;
+
+  const timer = document.getElementById("timer");
+  const upd = () => {
+    const left = Math.round((S.end - Date.now()) / 1000), a = Math.abs(left);
+    timer.textContent = (left < 0 ? "+" : "") + String(Math.floor(a / 60)).padStart(2, "0") + ":" + String(a % 60).padStart(2, "0");
+    timer.className = "timer" + (left < 0 ? " over" : left < 300 ? " warn" : "");
+    if (left <= 0) finishExam();
+  };
+  clearInterval(tick); upd(); tick = setInterval(upd, 1000);
+}
+
+function confirmFinish() {
+  const blank = S.items.filter(i => i.pick === null).length;
+  const m = document.createElement("div");
+  m.className = "modal";
+  m.innerHTML = `<div><h3>Finish the attempt?</h3><p class="muted">${blank ? `${blank} question${blank > 1 ? "s are" : " is"} still blank and will score 0.` : "All questions are answered."}</p>
+    <div class="row"><button class="btn primary" id="yes">Finish and see results</button><button class="btn" id="no">Keep going</button></div></div>`;
+  document.body.appendChild(m);
+  m.querySelector("#no").onclick = () => m.remove();
+  m.querySelector("#yes").onclick = () => { m.remove(); finishExam(); };
+}
+
+function finishExam() {
+  const items = S.items;
+  let score = 0, c = 0, w = 0, s = 0;
+  items.forEach(it => {
+    if (it.pick === null) { s++; return; }
+    const ok = it.pick === it.q.a;
+    ok ? (c++, score += POINTS) : (w++, score -= penalty(it.q));
+    recordAnswer(it.q, ok);
+  });
+  const used = Math.min(EXAM_MINUTES * 60, Math.round((Date.now() - (S.end - EXAM_MINUTES * 60000)) / 1000));
+  history.push({ date: new Date().toLocaleString([], { dateStyle: "short", timeStyle: "short" }), score, c, w, s });
+  history = history.slice(-20); store.set("history", history);
+  go("results", { items, score, c, w, s, used, filter: "wrong" });
+}
+
+// ---------- RESULTS ----------
+function renderResults() {
+  const { items, score, c, w, s, used, filter, practice } = S;
+  const byCh = {};
+  items.forEach(it => {
+    const r = byCh[it.q.c] ||= { n: 0, c: 0, w: 0, s: 0, pts: 0 };
+    r.n++;
+    if (it.pick === null) r.s++;
+    else if (it.pick === it.q.a) { r.c++; r.pts += POINTS; }
+    else { r.w++; r.pts -= penalty(it.q); }
+  });
+  const shown = items.map((it, i) => ({ it, i })).filter(({ it }) =>
+    filter === "all" ? true : filter === "wrong" ? it.pick !== null && it.pick !== it.q.a : it.pick === null);
+  app.innerHTML = `
+  <div class="stack">
+    <p class="eyebrow">${practice ? esc(practice) + " · result" : "Mock exam result"}</p>
+    <div class="score">
+      ${practice ? `<div class="big">${Math.round(c / items.length * 100)}<small> %</small></div>`
+        : `<div class="big">${fmt(Math.max(score, 0))}<small> / 20</small></div>`}
+      <div class="stack" style="gap:8px">
+        <div class="tally"><span class="g">✓ ${c} correct</span><span class="b">✗ ${w} wrong</span><span class="s">○ ${s} ${practice ? "skipped" : "blank"}</span></div>
+        <span class="muted mono" style="font-size:13px">${practice ? `${items.length} questions · ${fmt(score)} points with exam penalties`
+          : `Time used ${Math.floor(used / 60)}:${String(used % 60).padStart(2, "0")} of ${EXAM_MINUTES}:00${score < 0 ? ` · raw score ${fmt(score)}` : ""}`}</span>
+      </div>
+    </div>
+    <div class="grid">${items.map((it, i) => `<span class="cell ${it.pick === null ? "" : it.pick === it.q.a ? "r-good" : "r-bad"}" style="display:grid;place-items:center">${i + 1}</span>`).join("")}</div>
+
+    <h2 style="margin-top:12px">By chapter</h2>
+    <div class="tbl"><table>
+      <tr><th>Chapter</th><th class="num">Qs</th><th class="num">✓</th><th class="num">✗</th><th class="num">○</th><th class="num">Points</th></tr>
+      ${Object.keys(byCh).sort((a, b) => a - b).map(k => { const r = byCh[k]; return `<tr><td>Ch.${k} ${esc(CHAPTERS[k])}</td><td class="num">${r.n}</td><td class="num">${r.c}</td><td class="num">${r.w}</td><td class="num">${r.s}</td><td class="num">${fmt(r.pts)}</td></tr>`; }).join("")}
+    </table></div>
+
+    <div class="row" style="justify-content:space-between;margin-top:12px">
+      <h2>Review</h2>
+      <div class="seg">
+        <button data-f="wrong" class="${filter === "wrong" ? "on" : ""}">Wrong (${w})</button>
+        <button data-f="blank" class="${filter === "blank" ? "on" : ""}">Blank (${s})</button>
+        <button data-f="all" class="${filter === "all" ? "on" : ""}">All (${items.length})</button>
+      </div>
+    </div>
+    <div class="review">
+      ${shown.length ? shown.map(({ it, i }) => `<div class="qcard">${metaHTML(it, i + 1, items.length)}<p class="qtext">${esc(it.q.q)}</p><div class="opts">${optionsHTML(it, { reveal: true, disabled: true })}</div>${explainHTML(it)}</div>`).join("")
+        : `<p class="muted">Nothing here.</p>`}
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn primary" id="again">${S.chapter ? "Repeat this chapter" : "New mock exam"}</button>
+      <button class="btn" id="home">Back to start</button>
+    </div>
+  </div>`;
+  app.querySelectorAll(".seg button").forEach(b => b.onclick = () => { S.filter = b.dataset.f; renderResults(); });
+  document.getElementById("again").onclick = () => S.chapter ? startChapter(S.chapter) : startExam();
+  document.getElementById("home").onclick = () => go("home");
+}
+
+// ---------- PRACTICE ----------
+function renderPractice() {
+  const { items, cur, label } = S;
+  if (!items.length) return go("home");
+  const item = items[cur], done = items.slice(0, cur + 1).filter(i => i.pick !== null);
+  const ok = done.filter(i => i.pick === i.q.a).length;
+  const pts = done.reduce((s, i) => s + (i.pick === i.q.a ? POINTS : -penalty(i.q)), 0);
+  const answered = item.pick !== null;
+  app.innerHTML = `
+  <div class="bar"><div class="bar-top">
+    <span class="eyebrow">${esc(label)}</span>
+    <span class="mono" style="font-size:13px">${ok}/${done.length} correct · ${fmt(pts)} pts</span>
+    <button class="btn" id="stop">Finish</button>
+  </div></div>
+  <div class="qcard">
+    ${metaHTML(item, cur + 1, items.length)}
+    <p class="qtext">${esc(item.q.q)}</p>
+    <div class="opts">${optionsHTML(item, { reveal: answered, disabled: answered })}</div>
+    ${answered ? explainHTML(item) : `<button class="link" id="skip">I don't know, show the answer</button>`}
+  </div>
+  <div class="nav">
+    <span></span>
+    <button class="btn primary" id="next" ${answered || item.skipped ? "" : "disabled"}>${cur === items.length - 1 ? "Finish" : "Next →"}</button>
+  </div>`;
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    item.pick = +b.dataset.oi; recordAnswer(item.q, item.pick === item.q.a); renderPractice();
+  });
+  const skip = document.getElementById("skip");
+  if (skip) skip.onclick = () => {
+    item.skipped = true; recordAnswer(item.q, false);
+    skip.outerHTML = explainHTML(item);
+    app.querySelectorAll(".opt").forEach(b => { b.disabled = true; if (+b.dataset.oi === item.q.a) b.classList.add("ok"); });
+    document.getElementById("next").disabled = false;
+  };
+  document.getElementById("next").onclick = () => cur === items.length - 1 ? finishPractice() : (S.cur++, renderPractice(), window.scrollTo(0, 0));
+  document.getElementById("stop").onclick = finishPractice;
+}
+
+// ---------- QUESTION BANK ----------
+function renderBank() {
+  app.innerHTML = `
+  <div class="stack">
+    <div class="row" style="justify-content:space-between"><h1 style="font-size:30px">Question bank</h1><button class="btn" id="home">Back to start</button></div>
+    <div class="tools">
+      <input id="q" type="search" placeholder="Search questions, answers, explanations" value="${esc(S.query)}">
+      <select id="ch"><option value="0">All chapters</option>${Object.entries(CHAPTERS).map(([c, t]) => `<option value="${c}" ${S.ch === c ? "selected" : ""}>Ch.${c} ${esc(t)}</option>`).join("")}</select>
+    </div>
+    <p class="muted" id="count"></p>
+    <div id="list"></div>
+  </div>`;
+  const list = document.getElementById("list"), count = document.getElementById("count");
+  const draw = () => {
+    const term = S.query.trim().toLowerCase();
+    const rows = QUESTIONS.filter(q => (S.ch === "0" || q.c === +S.ch) &&
+      (!term || (q.q + " " + q.o.join(" ") + " " + q.e).toLowerCase().includes(term)));
+    count.textContent = `${rows.length} question${rows.length === 1 ? "" : "s"}. Open one to see the answer.`;
+    list.innerHTML = rows.map(q => `<details class="bank"><summary><span class="id">Q${q.id} · Ch.${q.c}</span><span>${esc(q.q)}</span></summary>
+      <ol type="A">${q.o.map((o, i) => `<li class="${i === q.a ? "ok" : ""}">${esc(o)}</li>`).join("")}</ol>
+      <div class="explain">${esc(q.e)}</div></details>`).join("");
+  };
+  document.getElementById("q").oninput = e => { S.query = e.target.value; draw(); };
+  document.getElementById("ch").onchange = e => { S.ch = e.target.value; draw(); };
+  document.getElementById("home").onclick = () => go("home");
+  draw();
+}
+
+// Direct links: #exam, #bank, #ch1 … #ch7 open that mode straight away.
+const hash = location.hash.slice(1), chMatch = hash.match(/^ch([1-7])$/);
+if (hash === "exam") startExam();
+else if (hash === "bank") go("bank", { query: "", ch: "0" });
+else if (chMatch) startChapter(+chMatch[1]);
+else render();
+</script>
